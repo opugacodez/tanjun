@@ -44,6 +44,7 @@ dependencies:
   permission_handler: ^11.3.1
   shared_preferences: ^2.2.3
   ffmpeg_kit_flutter: ^6.0.3
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:

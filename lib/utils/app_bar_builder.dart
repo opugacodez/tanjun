@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Builds the app bar for the application.
 ///
@@ -16,7 +17,27 @@ AppBar buildAppBar(BuildContext context) {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: const Text('Tanjun'),
-                  content: const Text('Version 0.0.1-alpha\nView source code at <>'),
+                  content: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text("Version 0.0.1-alpha"),
+                      Row(
+                        children: [
+                          const Text("View the source code at "),
+                          InkWell(
+                              child: const Text('GitHub', style: TextStyle(
+                                color: Colors.blue,
+                              ),),
+                              onTap: ()
+                              {
+                                launch('https://github.com/opugacodez/tanjun');
+                              }
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                   actions: <Widget>[
                     TextButton(
                       child: const Text('OK'),
