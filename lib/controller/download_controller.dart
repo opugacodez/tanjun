@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
-// import 'package:ffmpeg_kit_flutter/return_code.dart';
+import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
-// import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 
 class DownloadController {
   final BuildContext context;
@@ -17,20 +17,8 @@ class DownloadController {
   Stream<DownloadProgress> get progressStream => _progressController.stream;
 
   String cleanFileName(String input) {
-    var cleaned = input.characters
-        .where((c) => RegExp(r'[a-zA-Z0-9 ]').hasMatch(c))
-        .join();
-    cleaned = cleaned
-        .replaceAll(r'\', '')
-        .replaceAll('/', '')
-        .replaceAll('*', '')
-        .replaceAll('?', '')
-        .replaceAll('"', '')
-        .replaceAll('<', '')
-        .replaceAll('>', '')
-        .replaceAll('|', '')
-        .trim();
-    return cleaned;
+    var cleaned = input.replaceAll(RegExp(r'[^\w\s-áàâãéêíóôõúçÁÀÂÃÉÊÍÓÔÕÚÇ]'), '');
+    return cleaned.trim();
   }
 
   Future<void> downloadPlaylist(String playlistUrl, String directory) async {
@@ -97,8 +85,7 @@ class DownloadController {
           video.title, 100, completedVideos / totalVideos * 100));
       downloadedVideos.add(video.title);
 
-      // Uncomment and refactor this block if you want to convert to MP3
-      // await _convertToMp3(filePath, dirPath, video.title);
+      await _convertToMp3(filePath, dirPath, video.title);
 
     } catch (e) {
       debugPrint('Error downloading video: $e');
@@ -110,29 +97,29 @@ class DownloadController {
     }
   }
 
-  // Uncomment and refactor this method if you want to convert to MP3
-  // Future<void> _convertToMp3(String filePath, String dirPath, String title) async {
-  //   var mp3FilePath = '$dirPath/${cleanFileName(title)}.mp3';
-  //
-  //   if (await File(filePath).exists()) {
-  //     FFmpegKit.execute('-i "$filePath" -vn -ab 256k -ar 44100 "$mp3FilePath"').then((session) async {
-  //       final returnCode = await session.getReturnCode();
-  //
-  //       if (ReturnCode.isSuccess(returnCode)) {
-  //         debugPrint("FFMEG: SUCCESS");
-  //       } else if (ReturnCode.isCancel(returnCode)) {
-  //         debugPrint("FFMEG: CANCEL");
-  //       } else {
-  //         debugPrint("FFMEG: ERROR");
-  //         final state = await session.getState();
-  //         final errorLogs = await session.getAllLogsAsString();
-  //
-  //         debugPrint("FFMEG State: $state");
-  //         debugPrint("FFMEG Error Logs: $errorLogs");
-  //       }
-  //     });
-  //   }
-  // }
+  Future<void> _convertToMp3(String filePath, String dirPath, String title) async {
+    var audioFilePath = '$dirPath/${cleanFileName(title)}.aac';
+
+    if (await File(filePath).exists()) {
+      FFmpegKit.execute('-i "$filePath" -vn -acodec copy "$audioFilePath"').then((session) async {
+        final returnCode = await session.getReturnCode();
+
+        if (ReturnCode.isSuccess(returnCode)) {
+          debugPrint("FFMEG: SUCCESS");
+          File(filePath).delete();
+        } else if (ReturnCode.isCancel(returnCode)) {
+          debugPrint("FFMEG: CANCEL");
+        } else {
+          debugPrint("FFMEG: ERROR");
+          final state = await session.getState();
+          final errorLogs = await session.getAllLogsAsString();
+
+          debugPrint("FFMEG State: $state");
+          debugPrint("FFMEG Error Logs: $errorLogs");
+        }
+      });
+    }
+  }
 
   void dispose() {
     _progressController.close();
