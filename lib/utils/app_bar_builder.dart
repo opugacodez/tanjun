@@ -31,7 +31,7 @@ AppBar buildAppBar(BuildContext context) {
                               ),),
                               onTap: ()
                               {
-                                launch('https://github.com/opugacodez/tanjun');
+                                launchUrl(Uri.parse('https://github.com/opugacodez/tanjun'));
                               }
                           ),
                         ],
