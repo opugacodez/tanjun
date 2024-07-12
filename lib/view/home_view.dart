@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
+// import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yt_downloader/controller/download_controller.dart';
 import '../widgets/custom_card.dart';
@@ -32,13 +32,13 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  Future<void> _saveDownloadDirectory(String directory) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('downloadDirectory', directory);
-    setState(() {
-      _downloadDirectory = directory;
-    });
-  }
+  // Future<void> _saveDownloadDirectory(String directory) async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   await prefs.setString('downloadDirectory', directory);
+  //   setState(() {
+  //     _downloadDirectory = directory;
+  //   });
+  // }
 
   @override
   void dispose() {
@@ -46,13 +46,13 @@ class _HomeViewState extends State<HomeView> {
     super.dispose();
   }
 
-  Future<void> _pickDownloadDirectory() async {
-    String? downloadDirectory = await FilePicker.platform.getDirectoryPath();
-
-    if (downloadDirectory != null) {
-      await _saveDownloadDirectory(downloadDirectory);
-    }
-  }
+  // Future<void> _pickDownloadDirectory() async {
+  //   String? downloadDirectory = await FilePicker.platform.getDirectoryPath();
+  //
+  //   if (downloadDirectory != null) {
+  //     await _saveDownloadDirectory(downloadDirectory);
+  //   }
+  // }
 
   void _startDownload() async {
     final String url = _urlController.text;
@@ -94,7 +94,7 @@ class _HomeViewState extends State<HomeView> {
             children: [
               CustomCard(
                 icon: Icons.folder_outlined,
-                title: 'Set your download directory',
+                title: 'Set your download location',
                 content: _buildDownloadDirectoryContent(),
               ),
               CustomCard(
@@ -124,9 +124,30 @@ class _HomeViewState extends State<HomeView> {
           ),
         ),
         IconButton(
-          onPressed: _pickDownloadDirectory,
-          icon: Icon(Icons.folder_open),
-        ),
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text("Info"),
+                      content: const Text("At the moment, downloads can only be stored in:\n/storage/emulated/0/Download/Tanjun"),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text('OK'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    );
+                  });
+            },
+            icon: Icon(Icons.info_outline)
+        )
+        // IconButton(
+        //   onPressed: _pickDownloadDirectory,
+        //   icon: Icon(Icons.folder_open),
+        // ),
       ],
     );
   }
